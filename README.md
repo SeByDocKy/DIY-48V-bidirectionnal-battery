@@ -8,6 +8,8 @@ La boucle de régulation est **très rapide**, en particulier lorsque l'option *
 
 Le système peut délivrer jusqu'à **3600W en charge comme en décharge**, et dispose d'une **sortie offgrid/backup** permettant d'alimenter des charges critiques en cas de coupure secteur. ⚠️ Cette sortie offgrid nécessite une attention particulière au **régime de neutre (TT/TN)** et aux organes de protection associés (disjoncteur différentiel, commutation de neutre le cas échéant) — une intervention par une personne compétente en électricité est indispensable pour ce point précis.
 
+Le contrôleur principal est un **ESP32-S3**, flashé avec un firmware **[ESPHome](https://esphome.io) 100% open source** — aucune dépendance à un cloud propriétaire, aucune télémétrie imposée : tout le code de régulation est visible, modifiable et auditable.
+
 Associé à n'importe quelle batterie DIY LFP de **16 kWh**, le coût total du système avoisine les **2100 €**.
 
 Ce dépôt documente la **version 2** du projet, construite autour d'un **PCM (Power Conversion Module) 3600W/48V** piloté par CAN bus (MCP2515), en remplacement du couple R48/HMS de la V1.
