@@ -6,6 +6,10 @@ C'est en somme l'équivalent **DIY** (fait maison, open source, personnalisable)
 
 La boucle de régulation est **très rapide**, en particulier lorsque l'option **feed-forward** est activée : un appel de charge brutal est absorbé en quelques secondes seulement. À titre d'exemple, une charge de **2000W peut être complètement compensée en 2 à 3 secondes**.
 
+Le système peut délivrer jusqu'à **3600W en charge comme en décharge**, et dispose d'une **sortie offgrid/backup** permettant d'alimenter des charges critiques en cas de coupure secteur. ⚠️ Cette sortie offgrid nécessite une attention particulière au **régime de neutre (TT/TN)** et aux organes de protection associés (disjoncteur différentiel, commutation de neutre le cas échéant) — une intervention par une personne compétente en électricité est indispensable pour ce point précis.
+
+Associé à n'importe quelle batterie DIY LFP de **16 kWh**, le coût total du système avoisine les **2100 €**.
+
 Ce dépôt documente la **version 2** du projet, construite autour d'un **PCM (Power Conversion Module) 3600W/48V** piloté par CAN bus (MCP2515), en remplacement du couple R48/HMS de la V1.
 
 ---
@@ -36,18 +40,13 @@ Le composant ESPHome custom [`dualpidpcm`](./components/dualpidpcm) calcule en c
 
 ---
 
----
-
 ## 🎥 Démonstration
 
 📺 [La batterie bidirectionnelle V2 en fonctionnement](https://youtu.be/oHbPmVrNmeo)
 
 ---
 
----
-
 ## 📷 Aperçu photo
-
 
 ### PCM 3600W/48V bidirectionnel
 ![PCM 3600W/48V bidirectionnel](images/pcm.png)
@@ -200,6 +199,7 @@ Le cœur de la régulation est le composant custom `dualpidpcm`. Une fois flash�
 ## ⚠️ Avertissements
 
 - Ce projet manipule du **230V AC** et de la **haute tension DC batterie (48-58V)** — toute intervention doit être réalisée par une personne compétente en électricité, hors tension, avec les protections adéquates (fusibles, sectionneur).
+- La **sortie offgrid/backup** implique une vigilance particulière sur le **régime de neutre (TT/TN)** et les organes de sécurité associés (différentiel, commutation de neutre) — à faire réaliser ou vérifier par un professionnel.
 - Ce dépôt est fourni **tel quel**, sans garantie. L'auteur ne peut être tenu responsable des dommages matériels ou corporels liés à la réalisation de ce projet.
 - Vérifiez la compatibilité de votre BMS et de votre batterie LFP avec les plages de tension configurées avant toute mise en service.
 
