@@ -98,7 +98,7 @@ Les trois fichiers réutilisent les mêmes **packages** ESPHome (chargés depuis
 - **1× XIAO ESP32-S3 Meshtastic (ESP32-S3 + LoRa SX1262)** *(alternative intégrée pour la variante LoRa)* — [Gotronic](https://www.gotronic.fr/art-xiao-esp32s3-mash-lora-40055.htm)
 - **1× contrôleur CAN MCP2515** — [AliExpress](https://fr.aliexpress.com/item/1005006135600010.html)
   *ou en alternative :*
-- **1x contrôleur CAN MCP2518FD - [Reichelt](https://www.reichelt.com/de/en/shop/product/developer_boards_-_can_module_mcp2518-376524)  
+- **1x contrôleur CAN MCP2518FD** - [Reichelt](https://www.reichelt.com/de/en/shop/product/developer_boards_-_can_module_mcp2518-376524)  
 - **1× convertisseur high-speed dual** — [AliExpress](https://fr.aliexpress.com/item/1005006063419651.html)
 
 ### Protections & connectique
