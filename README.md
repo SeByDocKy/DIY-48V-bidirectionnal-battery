@@ -2,6 +2,10 @@
 
 Système de gestion de batterie **bidirectionnelle** (charge / décharge) couplé en **AC** sur le réseau domestique, piloté par un régulateur **PID en boucle fermée** sous [ESPHome](https://esphome.io). Le système régule automatiquement la puissance échangée avec la batterie pour maintenir la puissance active mesurée au point d'injection (compteur) proche de **0 W** — c'est-à-dire consommer le surplus solaire pour charger, et puiser dans la batterie pour couvrir les pics de consommation.
 
+C'est en somme l'équivalent **DIY** (fait maison, open source, personnalisable) des batteries de stockage commerciales couplées AC type **Zendure SolarFlow**, **Anker SOLIX**, **EcoFlow** ou **Jackery** — avec l'avantage de pouvoir ajuster finement la régulation, le matériel et le logiciel à son propre usage.
+
+La boucle de régulation est **très rapide**, en particulier lorsque l'option **feed-forward** est activée : un appel de charge brutal est absorbé en quelques secondes seulement. À titre d'exemple, une charge de **2000W peut être complètement compensée en 2 à 3 secondes**.
+
 Ce dépôt documente la **version 2** du projet, construite autour d'un **PCM (Power Conversion Module) 3600W/48V** piloté par CAN bus (MCP2515), en remplacement du couple R48/HMS de la V1.
 
 ---
@@ -37,6 +41,30 @@ Le composant ESPHome custom [`dualpidpcm`](./components/dualpidpcm) calcule en c
 ## 🎥 Démonstration
 
 📺 [La batterie bidirectionnelle V2 en fonctionnement](https://youtu.be/oHbPmVrNmeo)
+
+---
+
+---
+
+## 📷 Aperçu photo
+
+*Les images ci-dessous pointent vers le dossier `images/` du dépôt — déposez-y vos fichiers (voir `images/README.txt`) pour qu'elles s'affichent. En attendant, chaque légende renvoie vers la page produit d'origine.*
+
+### PCM 3600W/48V bidirectionnel
+![PCM 3600W/48V bidirectionnel](images/pcm.png)
+*[Voir la page produit ↗](https://french.alibaba.com/product-detail/Industrial-Power-Inverter-PCB-Board-AC-1601732066501.html)*
+
+### XIAO ESP32-S3 Plus
+![XIAO ESP32-S3 Plus](images/xiao_ESP32_S3.jpg)
+*[Voir la page produit ↗](https://www.gotronic.fr/art-carte-xiao-esp32s3-plus-47626.htm)*
+
+### XIAO SX1262 (module LoRa)
+![XIAO SX1262](images/xiao_sx1262.jpg)
+*[Voir la page produit ↗](https://www.gotronic.fr/art-shield-xiao-wio-sx1262-47632.htm)*
+
+### PCB de contrôle V1.3 (custom)
+![PCB de contrôle V1.3](images/pcb_v1_3.jpg)
+*Photo à ajouter — voir le [fichier Gerber](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip) en attendant.*
 
 ---
 
