@@ -48,7 +48,6 @@ Le composant ESPHome custom [`dualpidpcm`](./components/dualpidpcm) calcule en c
 
 ## 📷 Aperçu photo
 
-*Les images ci-dessous pointent vers le dossier `images/` du dépôt — déposez-y vos fichiers (voir `images/README.txt`) pour qu'elles s'affichent. En attendant, chaque légende renvoie vers la page produit d'origine.*
 
 ### PCM 3600W/48V bidirectionnel
 ![PCM 3600W/48V bidirectionnel](images/pcm.png)
