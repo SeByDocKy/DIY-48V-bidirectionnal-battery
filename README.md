@@ -32,6 +32,14 @@ Le composant ESPHome custom [`dualpidpcm`](./components/dualpidpcm) calcule en c
 
 ---
 
+---
+
+## 🎥 Démonstration
+
+📺 [La batterie bidirectionnelle V2 en fonctionnement](https://youtu.be/oHbPmVrNmeo)
+
+---
+
 ## 🧩 Les trois variantes de communication
 
 Le projet propose **trois chaînes de mesure** différentes selon le compteur d'énergie utilisé et le lien de communication disponible. Les trois partagent la même base (BMS, PCM, régulateur PID) et ne diffèrent que par la façon dont la puissance active est remontée au contrôleur.
@@ -92,6 +100,12 @@ Le PCB **V1.3** (carte de contrôle intégrant l'ESP32, le lien LoRa et l'interf
 ---
 
 ## ⚙️ Installation
+
+### 0. Sans installer ESPHome (via Google Colab)
+
+Vous n'avez pas besoin d'installer le framework ESPHome sur votre machine : il est possible de compiler et flasher le firmware directement depuis le navigateur via Google Colab. La méthode est expliquée en vidéo ici :
+
+📺 [Compiler et flasher ESPHome sans installation, via Google Colab](https://youtu.be/cs016LD6Wy8)
 
 ### 1. Pré-requis
 
