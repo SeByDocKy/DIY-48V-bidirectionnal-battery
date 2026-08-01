@@ -1,3 +1,259 @@
+🇬🇧 [English](#-diy-48v-bidirectional-battery--pcm-ac-coupling) | 🇫🇷 [Français](#-batterie-diy-48v-bidirectionnelle--pcm-ac-coupling)
+
+---
+
+# 🔋 DIY 48V bidirectional battery — PCM AC-coupling
+
+**Bidirectional** (charge / discharge) battery management system, **AC-coupled** to the home grid, driven by a closed-loop **PID controller** running on [ESPHome](https://esphome.io). The system automatically regulates the power exchanged with the battery to keep the active power measured at the grid injection point (meter) close to **0 W** — i.e. absorbing solar surplus to charge, and drawing from the battery to cover consumption peaks.
+
+It is essentially the **DIY** equivalent (home-built, open source, fully customizable) of commercial AC-coupled storage batteries such as **Zendure SolarFlow**, **Anker SOLIX**, **EcoFlow** or **Jackery** — with the added benefit of being able to fine-tune the regulation, the hardware and the software to your own needs.
+
+The regulation loop is **very fast**, especially with the **feed-forward** option enabled: a sudden load step is absorbed within seconds. For example, a **2000W load can be fully compensated in 2 to 3 seconds**.
+
+The system can deliver up to **3600W in both charge and discharge**, and includes an **offgrid/backup output** to power critical loads during a grid outage. ⚠️ This offgrid output requires particular attention to the **earthing system (TT/TN)** and the associated safety devices (RCD/differential breaker, neutral switching where applicable) — this specific part must be carried out or checked by a qualified electrician.
+
+The main controller is an **ESP32-S3**, flashed with a **100% open source [ESPHome](https://esphome.io) firmware** — no dependency on a proprietary cloud, no forced telemetry: all the regulation code is visible, editable and auditable.
+
+Combined with any DIY LFP battery of **16 kWh**, the total cost of the system is around **€2100**.
+
+This repository documents **version 2** of the project, built around a **PCM (Power Conversion Module) 3600W/48V** driven over CAN bus (MCP2515), replacing the R48/HMS pair from V1.
+
+---
+
+## 📐 System overview
+
+```
+┌─────────────────┐        ┌──────────────────────────────┐        ┌──────────────┐
+│  Energy           │  ──▶   │   ESP32-S3 (XIAO)              │  ──▶   │  PCM 3600W    │
+│  meter             │        │   • Active power reading      │  CAN   │  bidirectional│
+│  (JSY1039 /        │        │   • PID controller (dualpidpcm)│        │  48V          │
+│  Shelly Pro 3EM)    │        │   • CAN control (MCP2515)      │        │              │
+└─────────────────┘        └──────────────────────────────┘        └───────┬──────┘
+                                       │                                    │
+                                       │ Modbus RTU (RS485)                 │ DC 48V
+                                       ▼                                    ▼
+                              ┌──────────────────┐                ┌─────────────────┐
+                              │  JK-PB-BMS BMS      │◀──────────────│  LFP battery     │
+                              │  (battery voltage)   │                │  51.2V           │
+                              └──────────────────┘                └─────────────────┘
+```
+
+The custom ESPHome component [`dualpidpcm`](./components/dualpidpcm) continuously computes the error between the measured active power and the setpoint (0 W), and drives the PCM over CAN bus to charge or discharge the battery accordingly, with:
+- a **two-threshold hysteresis** (stop / restart) per direction, to prevent rapid cycling of the PCM's internal relay;
+- accounting for the converter's **idle self-consumption** while discharging;
+- a **feed-forward** mode (calibrated setpoint jump) to react quickly to large load swings;
+- a direct charge ↔ discharge switch-over without cutting the PCM's main power supply whenever possible.
+
+---
+
+## 🎥 Demo
+
+📺 [The bidirectional V2 battery in action](https://youtu.be/oHbPmVrNmeo)
+
+---
+
+## 📷 Photo preview
+
+### PCM 3600W/48V bidirectional
+![PCM 3600W/48V bidirectional](images/pcm.png)
+*[View product page ↗](https://french.alibaba.com/product-detail/Industrial-Power-Inverter-PCB-Board-AC-1601732066501.html)*
+
+### XIAO ESP32-S3 Plus
+![XIAO ESP32-S3 Plus](images/xiao_ESP32_S3.jpg)
+*[View product page ↗](https://www.gotronic.fr/art-carte-xiao-esp32s3-plus-47626.htm)*
+
+### XIAO SX1262 (LoRa module)
+![XIAO SX1262](images/xiao_sx1262.jpg)
+*[View product page ↗](https://www.gotronic.fr/art-shield-xiao-wio-sx1262-47632.htm)*
+
+### V1.3 control PCB (custom)
+![V1.3 control PCB](images/pcb_v1_3.jpg)
+*Photo to be added — see the [Gerber file](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip) in the meantime.*
+
+---
+
+## 🧩 The three communication variants
+
+The project offers **three different measurement chains** depending on the energy meter used and the communication link available. All three share the same base (BMS, PCM, PID controller) and only differ in how the active power is reported back to the controller.
+
+| Variant | YAML file | Meter | Link | Notes |
+|---|---|---|---|---|
+| **LoRa** | [`bd_pcm_lora.yaml`](code/bd_pcm_lora.yaml) | JSY1039 | LoRa (SX1262, 868 MHz) via `packet_transport` | The meter is remote (e.g. on the main electrical panel), the battery receives the measurement wirelessly. Requires a shared encryption key (`encryption_key`). |
+| **Modbus TCP / WiFi** | [`bd_pcm_shellypro3em.yaml`](code/bd_pcm_shellypro3em.yaml) | Shelly Pro 3EM | Modbus TCP over WiFi (external `esphome_tcp` component) | Reads active power on a selectable phase (`phase_select` selector, p1/p2/p3) exposed by the Shelly. No RS485 wiring needed. |
+| **Direct Modbus RTU** | [`bd_pcm_jsy1039.yaml`](code/bd_pcm_jsy1039.yaml) | JSY1039 | Modbus RTU over RS485, direct wiring | The meter is wired directly on the same RS485 bus as the BMS (distinct Modbus addresses). Simplest setup, no network dependency. |
+
+All three files reuse the same ESPHome **packages** (loaded from GitHub):
+
+| Package | Role | Source |
+|---|---|---|
+| `bms` | JK-PB-BMS reading (battery voltage, cells, etc.) | [`pvbrain2/bms/jikong/device_jkpbbms.yaml`](https://github.com/SeByDocKy/pvbrain2) |
+| `pcm` | PCM control over CAN bus (MCP2515) | [`code/device_mcp2515_pcm.yaml`](code/device_mcp2515_pcm.yaml) |
+| `dualpidpcm` | Bidirectional PID controller (custom component) | [`code/device_dualpidpcm.yaml`](code/device_dualpidpcm.yaml) |
+| `powermeter` *(direct RTU variant only)* | Local JSY1039 reading | [`code/device_jsy1039.yaml`](code/device_jsy1039.yaml) |
+
+---
+
+## 🛠️ Hardware (BOM)
+
+### Electronics
+
+- **PCM 3600W / 48V bidirectional** (the only 48V model found so far) — [supplier link](https://french.alibaba.com/product-detail/Industrial-Power-Inverter-PCB-Board-AC-1601732066501.html)
+- **1× XIAO ESP32-S3 Plus** — [Gotronic](https://www.gotronic.fr/art-carte-xiao-esp32s3-plus-47626.htm)
+- **1× XIAO SX1262 (LoRa module)** *(LoRa variant only)* — [Gotronic](https://www.gotronic.fr/art-shield-xiao-wio-sx1262-47632.htm)
+- **1× XIAO ESP32-S3 Meshtastic (ESP32-S3 + LoRa SX1262)** *(integrated alternative for the LoRa variant)* — [Gotronic](https://www.gotronic.fr/art-xiao-esp32s3-mash-lora-40055.htm)
+- **1× MCP2515 CAN controller** — [AliExpress](https://fr.aliexpress.com/item/1005006135600010.html)
+  *or as an alternative:*
+- **1× MCP2518FD CAN controller** - [Reichelt](https://www.reichelt.com/de/en/shop/product/developer_boards_-_can_module_mcp2518-376524)
+- **1× dual high-speed converter** — [AliExpress](https://fr.aliexpress.com/item/1005006063419651.html)
+
+### Protection & connectors
+
+- **3× fuses + 3× fuse holders** — [fuse holders](https://fr.aliexpress.com/item/1005009482930402.html) / [fuses](https://fr.aliexpress.com/item/1005007451125243.html)
+- **3× 2-pin terminal block** — [AliExpress](https://fr.aliexpress.com/item/1005010629723401.html)
+- **JST 2.54mm male/female connectors** — [AliExpress](https://fr.aliexpress.com/item/4000873858801.html)
+- **Long 2.54mm connector** — [AliExpress](https://fr.aliexpress.com/item/1005006783391171.html)
+- **1× 600A disconnect switch** (DC battery protection) — [AliExpress](https://fr.aliexpress.com/item/1005010347499706.html)
+- **1× RJ45 connector** — [AliExpress](https://fr.aliexpress.com/item/1005009200192593.html)
+
+### Metering & power supply
+
+- **1× JSY-MK-1039 energy meter** — [AliExpress](https://fr.aliexpress.com/item/1005007956840686.html)
+- **1× 230V → 5V transformer** (logic power supply) — [AliExpress](https://fr.aliexpress.com/item/1005010271595546.html)
+
+> ⚠️ The Shelly Pro 3EM (Modbus TCP variant) is not listed here — it's an off-the-shelf product, available from most home automation/electrical retailers.
+
+---
+
+## 🖨️ PCB
+
+The **V1.3** PCB (control board integrating the ESP32, the LoRa link and the CAN interface) is available in Gerber format, ready to order from a PCB manufacturer (JLCPCB, PCBWay, etc.):
+
+📦 [`Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip`](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip)
+
+---
+
+## ⚙️ Installation
+
+### 0. Without installing ESPHome (via Google Colab)
+
+You don't need to install the ESPHome framework on your machine: the firmware can be compiled and flashed directly from your browser via Google Colab. The method is explained in this video:
+
+📺 [Compile and flash ESPHome without installation, via Google Colab](https://youtu.be/cs016LD6Wy8)
+
+### 1. Requirements
+
+- [ESPHome](https://esphome.io/guides/getting_started_command_line.html) ≥ 2025.10 (2026.7 recommended for the LoRa/RTU variants)
+- A `secrets.yaml` file at the root of the project containing at least:
+
+```yaml
+wifi_ssid: "MyWiFiNetwork"
+wifi_password: "MyWiFiPassword"
+ap_password: "FallbackPassword"
+encryption_key: "..."   # LoRa variant only (packet_transport)
+```
+
+### 2. Choosing a variant
+
+Select the YAML file matching your hardware setup:
+
+```bash
+# LoRa variant
+esphome run code/bd_pcm_lora.yaml
+
+# Modbus TCP variant (Shelly Pro 3EM)
+esphome run code/bd_pcm_shellypro3em.yaml
+
+# Direct Modbus RTU variant (wired JSY1039)
+esphome run code/bd_pcm_jsy1039.yaml
+```
+
+### 3. Parameters to adjust
+
+Each file exposes `substitutions` at the top to adjust for your installation, notably:
+
+- `bms_modbus_address` / `powermeter_modbus_address` / `shelly_modbus_address`: Modbus addresses of the devices on the bus
+- `shelly_ip_address` / `shelly_ip_port` *(TCP variant)*: IP address of the Shelly Pro 3EM
+- `pcm_min_charging`, `pcm_max_charging`, `pcm_min_discharging`, `pcm_max_discharging`: current bounds (A) sent to the PCM
+- `dualpidpcm_current_min_charging` / `dualpidpcm_current_min_discharging`: minimum currents actually usable by the PCM, used by the controller for its hysteresis thresholds
+
+---
+
+## 🎛️ The PID controller (`dualpidpcm`)
+
+The core of the regulation is the custom `dualpidpcm` component. Once flashed, it exposes in Home Assistant (or the ESPHome web interface):
+
+**Switches**
+- `activation` — enables/disables the regulation (⚠️ the state is persisted in flash, survives a reboot)
+- `feedforward` — enables the calibrated setpoint jump on large load changes
+- `allow_charging` / `allow_discharging` — independently allow/forbid charging and discharging
+- `reverse`, `pid_mode`, `manual_override` — advanced options
+
+**Numbers (adjustable on the fly)**
+- `setpoint` — active power setpoint (typically 0 W)
+- `kp`, `ki`, `kd` — PID gains
+- `self_consumption` / `discharge_self_consumption` — converter idle self-consumption while discharging (W)
+- `delta_idle_charging` / `delta_idle_discharging` — width of the anti-cycling hysteresis between stop and restart, per direction (W)
+- `feedforward_threshold` — trigger threshold for the feed-forward jump (W)
+- `starting_battery_voltage` / `stopping_battery_voltage` — battery under-voltage protection hysteresis
+- `output_min_charging`, `output_max_charging`, `output_min_discharging`, `output_max_discharging` — output bounds per direction (%)
+
+**Diagnostic sensors**
+- `pid_error`, `pid_output`, `pid_deadband`, `pid_mode` — to track the regulation in real time (e.g. via Grafana/InfluxDB or the Home Assistant history)
+
+---
+
+## ⚠️ Warnings
+
+- This project involves **230V AC** and **high-voltage DC battery power (48-58V)** — any work must be carried out by someone competent in electrical work, with the power off, and with proper protection devices (fuses, disconnect switch).
+- The **offgrid/backup output** requires particular attention to the **earthing system (TT/TN)** and the associated safety devices (RCD, neutral switching) — to be carried out or checked by a professional.
+- This repository is provided **as is**, without warranty. The author cannot be held responsible for any material or bodily damage resulting from building this project.
+- Verify the compatibility of your BMS and your LFP battery with the configured voltage ranges before any commissioning.
+
+---
+
+## 📄 License
+
+This project is distributed under the **MIT** license.
+
+```
+MIT License
+
+Copyright (c) 2026 SeByDocKy
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+The full text is also available in the [LICENSE](LICENSE) file of the repository.
+
+## 👤 Author
+
+[SeByDocKy](https://github.com/SeByDocKy) — [myESPhome repository](https://github.com/SeByDocKy/myESPhome)
+
+## 🔗 Useful links
+
+- [ESPHome — official documentation](https://esphome.io)
+- [pvbrain2 — BMS packages](https://github.com/SeByDocKy/pvbrain2)
+- [esphome_tcp — external Modbus TCP component](https://github.com/creepystefan/esphome_tcp)
+
+---
+---
+
 # 🔋 Batterie DIY 48V bidirectionnelle — PCM AC-coupling
 
 Système de gestion de batterie **bidirectionnelle** (charge / décharge) couplé en **AC** sur le réseau domestique, piloté par un régulateur **PID en boucle fermée** sous [ESPHome](https://esphome.io). Le système régule automatiquement la puissance échangée avec la batterie pour maintenir la puissance active mesurée au point d'injection (compteur) proche de **0 W** — c'est-à-dire consommer le surplus solaire pour charger, et puiser dans la batterie pour couvrir les pics de consommation.
