@@ -1,4 +1,4 @@
-# 🔋 Batterie bidirectionnelle V2 — PCM AC-coupling
+# 🔋 Batterie DIY 48V bidirectionnelle — PCM AC-coupling
 
 Système de gestion de batterie **bidirectionnelle** (charge / décharge) couplé en **AC** sur le réseau domestique, piloté par un régulateur **PID en boucle fermée** sous [ESPHome](https://esphome.io). Le système régule automatiquement la puissance échangée avec la batterie pour maintenir la puissance active mesurée au point d'injection (compteur) proche de **0 W** — c'est-à-dire consommer le surplus solaire pour charger, et puiser dans la batterie pour couvrir les pics de consommation.
 
