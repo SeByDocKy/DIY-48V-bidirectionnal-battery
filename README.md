@@ -91,6 +91,8 @@ All three files reuse the same ESPHome **packages** (loaded from GitHub):
 | `dualpidpcm` | Bidirectional PID controller (custom component) | [`code/device_dualpidpcm.yaml`](code/device_dualpidpcm.yaml) |
 | `powermeter` *(direct RTU variant only)* | Local JSY1039 reading | [`code/device_jsy1039.yaml`](code/device_jsy1039.yaml) |
 
+> ℹ️ The JSY1039 is not mandatory: any **bidirectional Modbus energy meter** can be used instead, for both the LoRa and direct RTU variants — for example the **JSY194** or the **SDM120**. You'll simply need to adjust the Modbus register mapping in the corresponding `device_*.yaml` package to match your meter's documentation.
+
 ---
 
 ## 🛠️ Hardware (BOM)
@@ -342,6 +344,8 @@ Les trois fichiers réutilisent les mêmes **packages** ESPHome (chargés depuis
 | `pcm` | Pilotage du PCM via CAN bus (MCP2515) | [`code/device_mcp2515_pcm.yaml`](code/device_mcp2515_pcm.yaml) |
 | `dualpidpcm` | Régulateur PID bidirectionnel (composant custom) | [`code/device_dualpidpcm.yaml`](code/device_dualpidpcm.yaml) |
 | `powermeter` *(variante RTU directe uniquement)* | Lecture JSY1039 en local | [`code/device_jsy1039.yaml`](code/device_jsy1039.yaml) |
+
+> ℹ️ Le JSY1039 n'est pas imposé : n'importe quel **compteur d'énergie Modbus bidirectionnel** peut être utilisé à sa place, aussi bien pour la variante LoRa que pour la variante RTU directe — par exemple le **JSY194** ou le **SDM120**. Il suffira d'adapter le mapping des registres Modbus dans le package `device_*.yaml` correspondant, selon la documentation de votre compteur.
 
 ---
 
