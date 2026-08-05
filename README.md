@@ -66,9 +66,9 @@ The custom ESPHome component [`dualpidpcm`](./components/dualpidpcm) continuousl
 ![XIAO SX1262](images/xiao_sx1262.jpg)
 *[View product page ↗](https://www.gotronic.fr/art-shield-xiao-wio-sx1262-47632.htm)*
 
-### V1.3 control PCB (custom)
-![V1.3 control PCB](images/pcb_v1_3.jpg)
-*Photo to be added — see the [Gerber file](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip) in the meantime.*
+### V1.4 control PCB (custom)
+![V1.4 control PCB](images/pcb_v1_4.jpg)
+*Photo to be added — see the [Gerber file](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-08-03.zip) in the meantime.*
 
 ---
 
@@ -128,9 +128,9 @@ All three files reuse the same ESPHome **packages** (loaded from GitHub):
 
 ## 🖨️ PCB
 
-The **V1.3** PCB (control board integrating the ESP32, the LoRa link and the CAN interface) is available in Gerber format, ready to order from a PCB manufacturer (JLCPCB, PCBWay, etc.):
+The **V1.4** PCB (control board integrating the ESP32, the LoRa link and the CAN interface) is available in Gerber format, ready to order from a PCB manufacturer (JLCPCB, PCBWay, etc.):
 
-📦 [`Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip`](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip)
+📦 [`Gerber_LoRa_PCB_LoRa-mix_2026-08-03.zip`](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-08-03.zip)
 
 ---
 
@@ -320,9 +320,9 @@ Le composant ESPHome custom [`dualpidpcm`](./components/dualpidpcm) calcule en c
 ![XIAO SX1262](images/xiao_sx1262.jpg)
 *[Voir la page produit ↗](https://www.gotronic.fr/art-shield-xiao-wio-sx1262-47632.htm)*
 
-### PCB de contrôle V1.3 (custom)
-![PCB de contrôle V1.3](images/pcb_v1_3.jpg)
-*Photo à ajouter — voir le [fichier Gerber](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip) en attendant.*
+### PCB de contrôle V1.4 (custom)
+![PCB de contrôle V1.4](images/pcb_v1_4.jpg)
+*Photo à ajouter — voir le [fichier Gerber](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-08-03.zip) en attendant.*
 
 ---
 
@@ -382,9 +382,9 @@ Les trois fichiers réutilisent les mêmes **packages** ESPHome (chargés depuis
 
 ## 🖨️ PCB
 
-Le PCB **V1.3** (carte de contrôle intégrant l'ESP32, le lien LoRa et l'interface CAN) est disponible au format Gerber, prêt à commander chez un fabricant de PCB (JLCPCB, PCBWay, etc.) :
+Le PCB **V1.4** (carte de contrôle intégrant l'ESP32, le lien LoRa et l'interface CAN) est disponible au format Gerber, prêt à commander chez un fabricant de PCB (JLCPCB, PCBWay, etc.) :
 
-📦 [`Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip`](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-05-16_V1_3.zip)
+📦 [`Gerber_LoRa_PCB_LoRa-mix_2026-08-03.zip`](gerber/Gerber_LoRa_PCB_LoRa-mix_2026-08-03.zip)
 
 ---
 
